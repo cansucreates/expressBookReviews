@@ -26,31 +26,68 @@ public_users.post("/register", (req,res) => {
 });
 
 // Get the book list available in the shop
-public_users.get('/',function (req, res) {
-  res.send(JSON.stringify(books,null,4));
-}); 
+public_users.get('/', function (req, res) {
+  new Promise((resolve, reject) => {
+    resolve(JSON.stringify(books, null, 4));
+  })
+    .then((bookList) => {
+      res.send(bookList);
+    })
+    .catch((error) => {
+      res.status(500).send('Error retrieving book list');
+    });
+});
 
 
 // Get book details based on ISBN
 public_users.get('/isbn/:isbn', function (req, res) {
-  const isbn = req.params.isbn;
-  res.send(books[isbn]);
+  new Promise ((resolve,reject) => {
+    resolve(JSON.stringify(books[req.params.isbn], null, 4));
+  })
+    .then((bookDetails) => {
+      res.send(bookDetails);
+    })
+    .catch((error) => {
+      res.status(500).send('Error retrieving book details');
+    });
 });
 
 public_users.get('/author/:author', function (req, res) {
-  const author = req.params.author;
+  // using promises as an alternative
+  new Promise((resolve) => {
+    resolve(Object.keys(books).find(isbn => books[isbn].author === req.params.author));
+  })
+  .then((isbn) => {
+    res.send(books[isbn]);
+  })
+  .catch(() => {
+    res.status(500).send('Error retrieving book details');
+  });
+
+  /* const author = req.params.author;
   const isbn = Object.keys(books).find(isbn => books[isbn].author === author);
 
   if (isbn) {
     res.send(books[isbn]);
   } else {
     res.status(404).send('Book not found for the given author');
-  }
+  } */
 });
 
 // Get all books based on title
 public_users.get('/title/:title', function (req, res) {
-  const title = req.params.title;
+
+  new Promise((resolve) => {
+    resolve(Object.keys(books).find(isbn => books[isbn].title === req.params.title));
+  })
+  .then((isbn) => {
+    res.send(books[isbn]);
+  })
+  .catch(() => {
+    res.status(500).send('Error retrieving book details');
+  });
+
+  /* const title = req.params.title;
   const isbn = Object.keys(books).find(isbn => books[isbn].title === title);
 
   if (isbn) {
@@ -58,13 +95,22 @@ public_users.get('/title/:title', function (req, res) {
   } else {
     res.status(404).send('Book not found for the given title');
   }
-  
+  */
 });
 
 //  Get book review
 public_users.get('/review/:isbn',function (req, res) {
-  const isbn = req.params.isbn;
-  res.send(books[isbn].reviews);
+  new Promise((resolve) => {
+    resolve(books[req.params.isbn].reviews);
+  })
+  .then((reviews) => {
+    res.send(reviews);
+  })
+  .catch(() => {
+    res.status(500).send('Error retrieving book review');
+  });
+  // const isbn = req.params.isbn;
+  // res.send(books[isbn].reviews);
 });
 
 module.exports.general = public_users;

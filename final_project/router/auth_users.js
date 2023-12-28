@@ -45,7 +45,6 @@ regd_users.post("/login", (req,res) => {
 });
 
 // Add a book review
-// burada kaldım
 regd_users.put("/auth/review/:isbn", (req, res) => {
   const isbn = req.params.isbn;
   const review = req.body.reviews;
